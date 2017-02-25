@@ -1,0 +1,7 @@
+include LICENSE
+include *.rst
+recursive-include doc *.rst *.py
+include portaudio/LICENSE.txt
+include portaudio/index.html
+include portaudio/src/common/pa_ringbuffer.h
+include portaudio/src/common/pa_memorybarrier.h

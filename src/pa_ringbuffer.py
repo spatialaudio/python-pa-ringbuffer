@@ -195,3 +195,8 @@ class RingBuffer(object):
     def elementsize(self):
         """Element size in bytes."""
         return self._ptr.elementSizeBytes
+
+    def __len__(self):
+        """Size of buffer in elements"""
+        return self._ptr.bufferSize
+

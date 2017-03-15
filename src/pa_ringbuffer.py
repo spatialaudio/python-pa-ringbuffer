@@ -6,7 +6,8 @@ import _cffi_backend
 from _pa_ringbuffer import ffi as _ffi, lib as _lib
 
 
-def link_c_functions(otherffi, otherlib):
+def link(otherffi, otherlib):
+    global _ffi, _lib
     functionnames = (
         'PaUtil_InitializeRingBuffer',
         'PaUtil_FlushRingBuffer',
@@ -23,6 +24,7 @@ def link_c_functions(otherffi, otherlib):
         setattr(otherlib, name,
                 otherffi.cast(_ffi.getctype(_ffi.typeof(getattr(_lib, name))),
                               _ffi.addressof(_lib, name)))
+    _ffi, _lib = otherffi, otherlib
 
 
 class RingBuffer(object):

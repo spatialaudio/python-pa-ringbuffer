@@ -6,6 +6,25 @@ import _cffi_backend
 from _pa_ringbuffer import ffi as _ffi, lib as _lib
 
 
+def link_c_functions(otherffi, otherlib):
+    functionnames = (
+        'PaUtil_InitializeRingBuffer',
+        'PaUtil_FlushRingBuffer',
+        'PaUtil_GetRingBufferWriteAvailable',
+        'PaUtil_GetRingBufferReadAvailable',
+        'PaUtil_WriteRingBuffer',
+        'PaUtil_ReadRingBuffer',
+        'PaUtil_GetRingBufferWriteRegions',
+        'PaUtil_AdvanceRingBufferWriteIndex',
+        'PaUtil_GetRingBufferReadRegions',
+        'PaUtil_AdvanceRingBufferReadIndex',
+    )
+    for name in functionnames:
+        setattr(otherlib, name,
+                otherffi.cast(_ffi.getctype(_ffi.typeof(getattr(_lib, name))),
+                              _ffi.addressof(_lib, name)))
+
+
 class RingBuffer(object):
     """Wrapper for PortAudio's ring buffer.
 

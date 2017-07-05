@@ -46,9 +46,8 @@ ring_buffer_size_t PaUtil_AdvanceRingBufferReadIndex(PaUtilRingBuffer* rbuf, rin
 
 def init(ffi, lib):
     """Return RingBuffer class using the given CFFI instance."""
-    import collections
 
-    def create(elementsize, size):
+    def create_ringbuffer(elementsize, size):
         """Create an instance of PortAudio's ring buffer.
 
         Parameters
@@ -70,23 +69,20 @@ def init(ffi, lib):
         assert ptr.elementSizeBytes == elementsize
         return ptr
 
-    class Reader(_ReaderBase):
+    class RingBufferReader(_ReaderBase):
         _ffi = ffi
         _lib = lib
 
-    class Writer(_WriterBase):
+    class RingBufferWriter(_WriterBase):
         _ffi = ffi
         _lib = lib
 
-    rb = collections.namedtuple('rb', 'create Reader Writer')
-    return rb(create, Reader, Writer)
+    return create_ringbuffer, RingBufferReader, RingBufferWriter
 
 
 class _RingBufferBase(object):
 
     def __init__(self, ptr):
-        """
-        """
         self._ptr = ptr
 
     def flush(self):
@@ -96,15 +92,6 @@ class _RingBufferBase(object):
 
         """
         self._lib.PaUtil_FlushRingBuffer(self._ptr)
-
-    @property
-    def elementsize(self):
-        """Element size in bytes."""
-        return self._ptr.elementSizeBytes
-
-    def __len__(self):
-        """Size of buffer in elements"""
-        return self._ptr.bufferSize
 
 
 class _ReaderBase(_RingBufferBase):
@@ -163,10 +150,11 @@ class _ReaderBase(_RingBufferBase):
         ptr2 = self._ffi.new('void**')
         size1 = self._ffi.new('ring_buffer_size_t*')
         size2 = self._ffi.new('ring_buffer_size_t*')
+        elementsize = self._ptr.elementSizeBytes
         return (self._lib.PaUtil_GetRingBufferReadRegions(
                     self._ptr, size, ptr1, size1, ptr2, size2),
-                self._ffi.buffer(ptr1[0], size1[0] * self.elementsize),
-                self._ffi.buffer(ptr2[0], size2[0] * self.elementsize))
+                self._ffi.buffer(ptr1[0], size1[0] * elementsize),
+                self._ffi.buffer(ptr2[0], size2[0] * elementsize))
 
     def advance_read_index(self, size):
         """Advance the read index to the next location to be read.
@@ -242,10 +230,11 @@ class _WriterBase(_RingBufferBase):
         ptr2 = self._ffi.new('void**')
         size1 = self._ffi.new('ring_buffer_size_t*')
         size2 = self._ffi.new('ring_buffer_size_t*')
+        elementsize = self._ptr.elementSizeBytes
         return (self._lib.PaUtil_GetRingBufferWriteRegions(
                     self._ptr, size, ptr1, size1, ptr2, size2),
-                self._ffi.buffer(ptr1[0], size1[0] * self.elementsize),
-                self._ffi.buffer(ptr2[0], size2[0] * self.elementsize))
+                self._ffi.buffer(ptr1[0], size1[0] * elementsize),
+                self._ffi.buffer(ptr2[0], size2[0] * elementsize))
 
     def advance_write_index(self, size):
         """Advance the write index to the next location to be written.

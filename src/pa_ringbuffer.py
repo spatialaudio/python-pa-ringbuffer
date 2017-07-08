@@ -122,31 +122,51 @@ class _RingBufferBase(object):
                 raise ValueError('data size must be multiple of elementsize')
         return self._lib.PaUtil_WriteRingBuffer(self._ptr, data, size)
 
-    def read(self, data, size=-1):
-        """Read data from the ring buffer.
+    def read(self, size=-1):
+        """Read data from the ring buffer into a new buffer.
+
+        Parameters
+        ----------
+        size : int, optional
+            The number of elements to be read.
+            If not specified, all available elements are read.
+
+        Returns
+        -------
+        buffer
+            A new buffer containing the read data.
+            Its size may be less than the requested *size*.
+
+        """
+        if size < 0:
+            size = self.read_available
+        data = self._ffi.new(
+            'unsigned char[]', size * self._ptr.elementSizeBytes)
+        size = self.readinto(data)
+        return self._ffi.buffer(data, size * self._ptr.elementSizeBytes)
+
+    def readinto(self, data):
+        """Read data from the ring buffer into a user-provided buffer.
 
         Parameters
         ----------
         data : CData pointer or buffer
             The memory where the data should be stored.
-        size : int, optional
-            The number of elements to be read.
 
         Returns
         -------
         int
-            The number of elements read.
+            The number of elements read, which may be less than the size
+            of *data*.
 
         """
         try:
             data = self._ffi.from_buffer(data)
         except TypeError:
             pass  # input is not a buffer
-        if size < 0:
-            size, rest = divmod(self._ffi.sizeof(data),
-                                self._ptr.elementSizeBytes)
-            if rest:
-                raise ValueError('data size must be multiple of elementsize')
+        size, rest = divmod(self._ffi.sizeof(data), self._ptr.elementSizeBytes)
+        if rest:
+            raise ValueError('data size must be multiple of elementsize')
         return self._lib.PaUtil_ReadRingBuffer(self._ptr, data, size)
 
     def get_write_buffers(self, size):

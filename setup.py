@@ -19,7 +19,7 @@ setup(
     long_description=open('README.rst').read(),
     license='MIT',
     keywords='sound audio PortAudio ringbuffer lock-free'.split(),
-    #url='',
+    url='https://github.com/spatialaudio/python-pa-ringbuffer',
     platforms='any',
     classifiers=[
         'License :: OSI Approved :: MIT License',

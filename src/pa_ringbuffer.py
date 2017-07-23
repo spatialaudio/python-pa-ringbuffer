@@ -59,6 +59,8 @@ class _RingBufferBase(object):
     def __init__(self, elementsize, size):
         """Create an instance of PortAudio's ring buffer.
 
+        http://portaudio.com/docs/v19-doxydocs-dev/pa__ringbuffer_8h.html
+
         Parameters
         ----------
         elementsize : int

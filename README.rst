@@ -1,31 +1,24 @@
 Python wrapper for PortAudio's ring buffer
 ==========================================
 
-The ring buffer functionality is typically not included in binary distributions
-of PortAudio_, therefore most Python wrappers don't include it, either.
+The `ring buffer functionality`_ is typically not included in binary
+distributions of PortAudio_, therefore most Python wrappers don't include it,
+either.
 
-This module can be compiled and used on any Python version where CFFI_ is
-available.
+The ``pa_ringbuffer`` module provides only a Python wrapper, the actual
+PortAudio ring buffer code has to be compiled separately, see Usage_.
+It can be used on any Python version where CFFI_ is available.
 
-This module is designed to be used together with the sounddevice_ module
-(it might work with other modules, too) for non-blocking transfer of data from
-the main Python program to an audio callback function which is implemented in C
+This module is designed to be used together with the sounddevice_ module (it
+might work with other modules, too) for non-blocking transfer of data between
+the main Python program and an audio callback function which is implemented in C
 or some other compiled language.
 
 .. _PortAudio: http://portaudio.com/
+.. _ring buffer functionality: http://portaudio.com/docs/v19-doxydocs-dev/
+                               pa__ringbuffer_8h.html
 .. _sounddevice: http://python-sounddevice.readthedocs.io/
 .. _CFFI: http://cffi.readthedocs.io/
-
-Installation
-------------
-
-Use this if you want to install it locally in a development environment::
-
-    python3 setup.py develop --user
-
-or ::
-
-    python3 -m pip install -e . --user
 
 Usage
 -----
@@ -33,8 +26,7 @@ Usage
 This module is not meant to be used on its own, it is only useful in cooperation
 with another Python module using CFFI.
 
-You can get the Python code from PyPI (Note: not yet available!),
-for example in your ``setup.py`` file:
+You can get the Python code from PyPI_, for example in your ``setup.py`` file:
 
 .. code:: python
 
@@ -49,6 +41,8 @@ for example in your ``setup.py`` file:
         install_requires=['pa_ringbuffer'],
         ...,
     )
+
+.. _PyPI: https://pypi.python.org/pypi/pa-ringbuffer
 
 Alternatively, you can just copy the file ``src/pa_ringbuffer.py`` to your own
 source directory and import it from there.
@@ -97,3 +91,25 @@ use something like this to get access to the ``RingBuffer`` class:
     from _mycffimodule import ffi, lib
 
     RingBuffer = pa_ringbuffer.init(ffi, lib)
+
+API Reference
+-------------
+
+There are only two functions:
+
+``pa_ringbuffer.cdef()``
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+This function returns a string containing C declarations from the file
+``pa_ringbuffer.h``, which can be used as argument to CFFI's `cdef()`_ function
+(see Usage_ above).  Note that the returned declarations are slightly different
+when called on a macOS/Darwin system.
+
+.. _cdef(): http://cffi.readthedocs.io/en/latest/
+            cdef.html#ffi-ffibuilder-cdef-declaring-types-and-functions
+
+``pa_ringbuffer.init(ffi, lib)``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This function returns the ``RingBuffer`` class which is associated with the CFFI
+instance given by ``ffi`` and ``lib``.

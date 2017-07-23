@@ -74,8 +74,6 @@ class _RingBufferBase(object):
         if res != 0:
             assert res == -1
             raise ValueError('size must be a power of 2')
-        assert self._ptr.bufferSize == size
-        assert self._ptr.elementSizeBytes == elementsize
 
     def flush(self):
         """Reset buffer to empty.
@@ -116,8 +114,7 @@ class _RingBufferBase(object):
         except TypeError:
             pass  # input is not a buffer
         if size < 0:
-            size, rest = divmod(self._ffi.sizeof(data),
-                                self._ptr.elementSizeBytes)
+            size, rest = divmod(self._ffi.sizeof(data), self.elementsize)
             if rest:
                 raise ValueError('data size must be multiple of elementsize')
         return self._lib.PaUtil_WriteRingBuffer(self._ptr, data, size)
@@ -140,10 +137,9 @@ class _RingBufferBase(object):
         """
         if size < 0:
             size = self.read_available
-        data = self._ffi.new(
-            'unsigned char[]', size * self._ptr.elementSizeBytes)
+        data = self._ffi.new('unsigned char[]', size * self.elementsize)
         size = self.readinto(data)
-        return self._ffi.buffer(data, size * self._ptr.elementSizeBytes)
+        return self._ffi.buffer(data, size * self.elementsize)
 
     def readinto(self, data):
         """Read data from the ring buffer into a user-provided buffer.
@@ -164,7 +160,7 @@ class _RingBufferBase(object):
             data = self._ffi.from_buffer(data)
         except TypeError:
             pass  # input is not a buffer
-        size, rest = divmod(self._ffi.sizeof(data), self._ptr.elementSizeBytes)
+        size, rest = divmod(self._ffi.sizeof(data), self.elementsize)
         if rest:
             raise ValueError('data size must be multiple of elementsize')
         return self._lib.PaUtil_ReadRingBuffer(self._ptr, data, size)
@@ -264,4 +260,3 @@ class _RingBufferBase(object):
     def __len__(self):
         """Size of buffer in elements"""
         return self._ptr.bufferSize
-

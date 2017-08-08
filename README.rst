@@ -25,6 +25,7 @@ Usage
 
 This module is not meant to be used on its own, it is only useful in cooperation
 with another Python module using CFFI.
+For an example, have a look at https://github.com/spatialaudio/python-rtmixer.
 
 You can get the Python code from PyPI_, for example in your ``setup.py`` file:
 
@@ -113,3 +114,38 @@ when called on a macOS/Darwin system.
 
 This function returns the ``RingBuffer`` class which is associated with the CFFI
 instance given by ``ffi`` and ``lib``.
+
+Creating the Documentation
+--------------------------
+
+The documentation of the ``RingBuffer`` class is not available separately.
+If you are using Sphinx_, you can seamlessly include the documentation of the
+``RingBuffer`` class with your own documentation.
+An example for this can be found at
+https://github.com/spatialaudio/python-rtmixer, the generated documentation is
+available at http://python-rtmixer.readthedocs.io/#rtmixer.RingBuffer.
+
+You'll need to have the autodoc_ extension activated in your ``conf.py``:
+
+.. code:: python
+
+    extensions = [
+        ...,
+        'sphinx.ext.autodoc',
+        ...,
+    ]
+
+And somewhere within your module documentation, you should add this:
+
+.. code:: rst
+
+    .. autoclass:: RingBuffer
+       :inherited-members:
+
+Before that, you might have to use the currentmodule_ directive to select your
+own module.
+
+.. _Sphinx: http://www.sphinx-doc.org/
+.. _autodoc: http://www.sphinx-doc.org/ext/autodoc.html
+.. _currentmodule: http://www.sphinx-doc.org/domains.html
+                   #directive-py:currentmodule

@@ -11,7 +11,6 @@ def cdef():
         ring_buffer_size_t = 'int32_t'
     else:
         ring_buffer_size_t = 'long'
-
     return """
 /* Declarations from PortAudio's pa_ringbuffer.h: */
 typedef %(ring_buffer_size_t)s ring_buffer_size_t;
@@ -43,6 +42,7 @@ def init(ffi, lib):
     """Return RingBuffer class using the given CFFI instance."""
 
     class RingBuffer(_RingBufferBase):
+        __doc__ = _RingBufferBase.__doc__
         _ffi = ffi
         _lib = lib
 
@@ -50,25 +50,33 @@ def init(ffi, lib):
 
 
 class _RingBufferBase(object):
-    """Wrapper for PortAudio's ring buffer.
+    """PortAudio's single-reader single-writer lock-free ring buffer.
 
-    See __init__().
+    C API documentation:
+        http://portaudio.com/docs/v19-doxydocs-dev/pa__ringbuffer_8h.html
+    Python wrapper:
+        https://github.com/spatialaudio/python-pa-ringbuffer
+
+    Instances of this class can be used to transport data between Python
+    code and some compiled code running on a different thread.
+
+    This only works when there is a single reader and a single writer
+    (i.e. one thread or callback writes to the ring buffer, another
+    thread or callback reads from it).
+
+    This ring buffer is *not* appropriate for passing data from one
+    Python thread to another Python thread.  For this, the `queue.Queue`
+    class from the standard library can be used.
+
+    :param elementsize: The size of a single data element in bytes.
+    :type elementsize: int
+    :param size: The number of elements in the buffer (must be a
+        power of 2).
+    :type size: int
 
     """
 
     def __init__(self, elementsize, size):
-        """Create an instance of PortAudio's ring buffer.
-
-        http://portaudio.com/docs/v19-doxydocs-dev/pa__ringbuffer_8h.html
-
-        Parameters
-        ----------
-        elementsize : int
-            The size of a single data element in bytes.
-        size : int
-            The number of elements in the buffer (must be a power of 2).
-
-        """
         self._ptr = self._ffi.new('PaUtilRingBuffer*')
         self._data = self._ffi.new('unsigned char[]', size * elementsize)
         res = self._lib.PaUtil_InitializeRingBuffer(
@@ -80,7 +88,8 @@ class _RingBufferBase(object):
     def flush(self):
         """Reset buffer to empty.
 
-        Should only be called when buffer is NOT being read or written.
+        Should only be called when buffer is **not** being read or
+        written.
 
         """
         self._lib.PaUtil_FlushRingBuffer(self._ptr)
@@ -98,17 +107,13 @@ class _RingBufferBase(object):
     def write(self, data, size=-1):
         """Write data to the ring buffer.
 
-        Parameters
-        ----------
-        data : CData pointer or buffer or bytes
-            Data to write to the buffer.
-        size : int, optional
-            The number of elements to be written.
+        :param data: Data to write to the buffer.
+        :type data: CData pointer or buffer or bytes
+        :param size: The number of elements to be written.
+        :type size: int, optional
 
-        Returns
-        -------
-        int
-            The number of elements written.
+        :returns: The number of elements written.
+        :rtype: int
 
         """
         try:
@@ -124,17 +129,13 @@ class _RingBufferBase(object):
     def read(self, size=-1):
         """Read data from the ring buffer into a new buffer.
 
-        Parameters
-        ----------
-        size : int, optional
-            The number of elements to be read.
+        :param size: The number of elements to be read.
             If not specified, all available elements are read.
+        :type size: int, optional
 
-        Returns
-        -------
-        buffer
-            A new buffer containing the read data.
+        :returns: A new buffer containing the read data.
             Its size may be less than the requested *size*.
+        :rtype: buffer
 
         """
         if size < 0:
@@ -146,16 +147,12 @@ class _RingBufferBase(object):
     def readinto(self, data):
         """Read data from the ring buffer into a user-provided buffer.
 
-        Parameters
-        ----------
-        data : CData pointer or buffer
-            The memory where the data should be stored.
+        :param data: The memory where the data should be stored.
+        :type data: CData pointer or buffer
 
-        Returns
-        -------
-        int
-            The number of elements read, which may be less than the size
-            of *data*.
+        :returns: The number of elements read, which may be less than
+            the size of *data*.
+        :rtype: int
 
         """
         try:
@@ -170,20 +167,18 @@ class _RingBufferBase(object):
     def get_write_buffers(self, size):
         """Get buffer(s) to which we can write data.
 
-        Parameters
-        ----------
-        size : int
-            The number of elements desired.
+        When done writing, use :meth:`advance_write_index` to make the
+        written data available for reading.
 
-        Returns
-        -------
-        int
-            The room available to be written or the given *size*,
-            whichever is smaller.
-        buffer
-            The first buffer.
-        buffer
-            The second buffer.
+        :param size: The number of elements desired.
+        :type size: int
+
+        :returns:
+            * The room available to be written or the given *size*,
+              whichever is smaller.
+            * The first buffer.
+            * The second buffer.
+        :rtype: (int, buffer, buffer)
 
         """
         ptr1 = self._ffi.new('void**')
@@ -198,15 +193,15 @@ class _RingBufferBase(object):
     def advance_write_index(self, size):
         """Advance the write index to the next location to be written.
 
-        Parameters
-        ----------
-        size : int
-            The number of elements to advance.
+        :param size: The number of elements to advance.
+        :type size: int
 
-        Returns
-        -------
-        int
-            The new position.
+        :returns: The new position.
+        :rtype: int
+
+        .. note:: This is only needed when using
+            :meth:`get_write_buffers`, the method :meth:`write` takes
+            care of this by itself!
 
         """
         return self._lib.PaUtil_AdvanceRingBufferWriteIndex(self._ptr, size)
@@ -214,19 +209,18 @@ class _RingBufferBase(object):
     def get_read_buffers(self, size):
         """Get buffer(s) from which we can read data.
 
-        Parameters
-        ----------
-        size : int
-            The number of elements desired.
+        When done reading, use :meth:`advance_read_index` to make the
+        memory available for writing again.
 
-        Returns
-        -------
-        int
-            The number of elements available for reading.
-        buffer
-            The first buffer.
-        buffer
-            The second buffer.
+        :param size: The number of elements desired.
+        :type size: int
+
+        :returns:
+            * The number of elements available for reading (which might
+              be less than the requested *size*).
+            * The first buffer.
+            * The second buffer.
+        :rtype: (int, buffer, buffer)
 
         """
         ptr1 = self._ffi.new('void**')
@@ -241,15 +235,15 @@ class _RingBufferBase(object):
     def advance_read_index(self, size):
         """Advance the read index to the next location to be read.
 
-        Parameters
-        ----------
-        size : int
-            The number of elements to advance.
+        :param size: The number of elements to advance.
+        :type size: int
 
-        Returns
-        -------
-        int
-            The new position.
+        :returns: The new position.
+        :rtype: int
+
+        .. note:: This is only needed when using
+            :meth:`get_read_buffers`, the methods :meth:`read` and
+            :meth:`readinto` take care of this by themselves!
 
         """
         return self._lib.PaUtil_AdvanceRingBufferReadIndex(self._ptr, size)

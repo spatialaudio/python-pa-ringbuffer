@@ -1,6 +1,9 @@
-"""Python wrapper for PortAudio's ring buffer."""
+"""Python wrapper for PortAudio's ring buffer.
 
-__version__ = '0.0.0'
+https://github.com/spatialaudio/python-pa-ringbuffer
+
+"""
+__version__ = '0.1.0'
 
 
 def cdef():

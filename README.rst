@@ -27,7 +27,8 @@ This module is not meant to be used on its own, it is only useful in cooperation
 with another Python module using CFFI.
 For an example, have a look at https://github.com/spatialaudio/python-rtmixer.
 
-You can get the Python code from PyPI_, for example in your ``setup.py`` file:
+You can get the Python code from PyPI_, for example in your ``setup.py`` file
+(in the following example, your module would be called ``mycffimodule``):
 
 .. code:: python
 
@@ -38,6 +39,7 @@ You can get the Python code from PyPI_, for example in your ``setup.py`` file:
         version=...,
         author=...,
         ...,
+        cffi_modules=['mycffimodule_build.py:ffibuilder'],
         setup_requires=['CFFI', 'pa_ringbuffer'],
         install_requires=['pa_ringbuffer'],
         ...,
@@ -49,7 +51,8 @@ Alternatively, you can just copy the file ``src/pa_ringbuffer.py`` to your own
 source directory and import it from there.
 
 You can build your own CFFI module like described in
-http://cffi.readthedocs.io/en/latest/cdef.html, just adding a few more bits:
+http://cffi.readthedocs.io/en/latest/cdef.html, just adding a few more bits to
+your ``mycffimodule_build.py``:
 
 .. code:: python
 
@@ -84,7 +87,8 @@ header:
 * https://app.assembla.com/spaces/portaudio/git/source/master/include/portaudio.h
 
 Once you have compiled your extension module (with the help of CFFI), you can
-use something like this to get access to the ``RingBuffer`` class:
+use something like this in your own module to get access to the ``RingBuffer``
+class:
 
 .. code:: python
 
@@ -143,9 +147,10 @@ And somewhere within your module documentation, you should add this:
        :inherited-members:
 
 Before that, you might have to use the currentmodule_ directive to select your
-own module.
+own module.  Using automodule_ should also do.
 
 .. _Sphinx: http://www.sphinx-doc.org/
 .. _autodoc: http://www.sphinx-doc.org/ext/autodoc.html
 .. _currentmodule: http://www.sphinx-doc.org/domains.html
                    #directive-py:currentmodule
+.. _automodule: http://www.sphinx-doc.org/ext/autodoc.html#directive-automodule

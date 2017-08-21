@@ -76,12 +76,18 @@ class _RingBufferBase(object):
     :param size: The number of elements in the buffer (must be a
         power of 2).
     :type size: int
+    :param buffer: optional pre-allocated buffer to use with RingBuffer
+    :type buffer: buffer
 
     """
 
-    def __init__(self, elementsize, size):
+    def __init__(self, elementsize, size, buffer=None):
         self._ptr = self._ffi.new('PaUtilRingBuffer*')
-        self._data = self._ffi.new('unsigned char[]', size * elementsize)
+        if buffer is None:
+            self._data = self._ffi.new('unsigned char[]', size * elementsize)
+        else:
+            self._data = self._ffi.from_buffer(buffer)
+
         res = self._lib.PaUtil_InitializeRingBuffer(
             self._ptr, elementsize, size, self._data)
         if res != 0:

@@ -73,20 +73,30 @@ class _RingBufferBase(object):
 
     :param elementsize: The size of a single data element in bytes.
     :type elementsize: int
-    :param size: The number of elements in the buffer (must be a
-        power of 2).
+    :param size: The number of elements in the buffer (must be a power
+        of 2). Can be omitted if a pre-allocated buffer is passed.
     :type size: int
-    :param buffer: optional pre-allocated buffer to use with RingBuffer
+    :param buffer: optional pre-allocated buffer to use with RingBuffer.
     :type buffer: buffer
 
     """
 
-    def __init__(self, elementsize, size, buffer=None):
+    def __init__(self, elementsize, size=None, buffer=None):
         self._ptr = self._ffi.new('PaUtilRingBuffer*')
         if buffer is None:
+            if size is None:
+                raise ValueError(
+                    "size is required when buffer parameter is not specified")
             self._data = self._ffi.new('unsigned char[]', size * elementsize)
         else:
-            self._data = self._ffi.from_buffer(buffer)
+            try:
+                data = self._ffi.from_buffer(buffer)
+            except TypeError:
+                data = buffer
+            size, rest = divmod(self._ffi.sizeof(data), elementsize)
+            if rest:
+                raise ValueError('buffer size must be multiple of elementsize')
+            self._data = data
 
         res = self._lib.PaUtil_InitializeRingBuffer(
             self._ptr, elementsize, size, self._data)

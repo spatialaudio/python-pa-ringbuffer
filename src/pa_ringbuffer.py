@@ -85,9 +85,11 @@ class _RingBufferBase(object):
         self._ptr = self._ffi.new('PaUtilRingBuffer*')
         if buffer is None:
             if size is None:
-                raise ValueError(
+                raise TypeError(
                     "size is required when buffer parameter is not specified")
             self._data = self._ffi.new('unsigned char[]', size * elementsize)
+        elif size is not None:
+            raise TypeError('exactly one of {size, buffer} is required')            
         else:
             try:
                 data = self._ffi.from_buffer(buffer)

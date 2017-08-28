@@ -10,7 +10,7 @@ Instead of pip-installing the latest release from PyPI_, you should get the
 newest development version with Git::
 
    git clone https://github.com/spatialaudio/python-pa-ringbuffer.git
-   cd python-sounddevice
+   cd python-pa-ringbuffer
    python3 setup.py develop --user
 
 .. _PyPI: https://pypi.python.org/pypi/pa-ringbuffer

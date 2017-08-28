@@ -71,6 +71,10 @@ class _RingBufferBase(object):
     Python thread to another Python thread.  For this, the `queue.Queue`
     class from the standard library can be used.
 
+    Note that if you pass a read-only buffer object, you still get a writable
+    RingBuffer; it is your responsibility not to write there if the original
+    buffer doesn’t expect you to.
+
     :param elementsize: The size of a single data element in bytes.
     :type elementsize: int
     :param size: The number of elements in the buffer (must be a power
@@ -89,7 +93,7 @@ class _RingBufferBase(object):
                     "size is required when buffer parameter is not specified")
             self._data = self._ffi.new('unsigned char[]', size * elementsize)
         elif size is not None:
-            raise TypeError('exactly one of {size, buffer} is required')            
+            raise TypeError('exactly one of {size, buffer} is required')
         else:
             try:
                 data = self._ffi.from_buffer(buffer)

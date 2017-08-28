@@ -71,16 +71,15 @@ class _RingBufferBase(object):
     Python thread to another Python thread.  For this, the `queue.Queue`
     class from the standard library can be used.
 
-    Note that if you pass a read-only buffer object, you still get a writable
-    RingBuffer; it is your responsibility not to write there if the original
-    buffer doesn’t expect you to.
-
     :param elementsize: The size of a single data element in bytes.
     :type elementsize: int
     :param size: The number of elements in the buffer (must be a power
         of 2). Can be omitted if a pre-allocated buffer is passed.
     :type size: int
     :param buffer: optional pre-allocated buffer to use with RingBuffer.
+        Note that if you pass a read-only buffer object, you still get a
+        writable RingBuffer; it is your responsibility not to write
+        there if the original buffer doesn’t expect you to.
     :type buffer: buffer
 
     """

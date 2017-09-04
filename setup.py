@@ -8,6 +8,14 @@ for line in open('src/pa_ringbuffer.py'):
         exec(line)
         break
 
+LONG_DESCRIPTION = '\n'.join((
+    open('README.rst').read(),
+    'Version History',
+    '---------------',
+    '',
+    open('NEWS.rst').read(),
+))
+
 setup(
     name='pa-ringbuffer',
     version=__version__,
@@ -16,7 +24,7 @@ setup(
     author='Matthias Geier',
     author_email='Matthias.Geier@gmail.com',
     description="Python wrapper for PortAudio's ring buffer",
-    long_description=open('README.rst').read(),
+    long_description=LONG_DESCRIPTION,
     license='MIT',
     keywords='sound audio PortAudio ringbuffer lock-free'.split(),
     url='https://github.com/spatialaudio/python-pa-ringbuffer',

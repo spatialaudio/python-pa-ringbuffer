@@ -3,7 +3,7 @@
 https://github.com/spatialaudio/python-pa-ringbuffer
 
 """
-__version__ = '0.1.0'
+__version__ = '0.1.1'
 
 
 def cdef():

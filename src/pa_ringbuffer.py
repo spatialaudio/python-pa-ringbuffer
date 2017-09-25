@@ -79,7 +79,7 @@ class _RingBufferBase(object):
     :param buffer: optional pre-allocated buffer to use with RingBuffer.
         Note that if you pass a read-only buffer object, you still get a
         writable RingBuffer; it is your responsibility not to write
-        there if the original buffer doesn’t expect you to.
+        there if the original buffer doesn't expect you to.
     :type buffer: buffer
 
     """

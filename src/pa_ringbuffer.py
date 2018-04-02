@@ -131,6 +131,9 @@ class _RingBufferBase(object):
     def write(self, data, size=-1):
         """Write data to the ring buffer.
 
+        This advances the write index after writing;
+        calling :meth:`advance_write_index` is *not* necessary.
+
         :param data: Data to write to the buffer.
         :type data: CData pointer or buffer or bytes
         :param size: The number of elements to be written.
@@ -153,6 +156,9 @@ class _RingBufferBase(object):
     def read(self, size=-1):
         """Read data from the ring buffer into a new buffer.
 
+        This advances the read index after reading;
+        calling :meth:`advance_read_index` is *not* necessary.
+
         :param size: The number of elements to be read.
             If not specified, all available elements are read.
         :type size: int, optional
@@ -170,6 +176,9 @@ class _RingBufferBase(object):
 
     def readinto(self, data):
         """Read data from the ring buffer into a user-provided buffer.
+
+        This advances the read index after reading;
+        calling :meth:`advance_read_index` is *not* necessary.
 
         :param data: The memory where the data should be stored.
         :type data: CData pointer or buffer

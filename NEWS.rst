@@ -1,3 +1,6 @@
+0.1.3 (2018-06-02):
+ * No new features, just a minor documentation update
+
 0.1.2 (2017-10-21):
  * No new features, just a bug fix
 

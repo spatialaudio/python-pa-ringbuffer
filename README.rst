@@ -149,8 +149,22 @@ And somewhere within your module documentation, you should add this:
 Before that, you might have to use the currentmodule_ directive to select your
 own module.  Using automodule_ should also do.
 
+If you want to use Sphinx's nitpicky_ setting,
+you'll have to add a few things to ``nitpick_ignore``:
+
+.. code:: python
+
+    nitpicky = True
+    nitpick_ignore = [
+        ('py:class', 'optional'),
+        ('py:class', 'buffer'),
+        ('py:class', 'CData pointer'),
+    ]
+
 .. _Sphinx: http://www.sphinx-doc.org/
 .. _autodoc: http://www.sphinx-doc.org/ext/autodoc.html
 .. _currentmodule: http://www.sphinx-doc.org/domains.html
                    #directive-py:currentmodule
 .. _automodule: http://www.sphinx-doc.org/ext/autodoc.html#directive-automodule
+.. _nitpicky: https://www.sphinx-doc.org/en/master/
+    usage/configuration.html#confval-nitpicky

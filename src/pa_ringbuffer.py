@@ -138,9 +138,7 @@ class _RingBufferBase(object):
         :type data: CData pointer or buffer or bytes
         :param size: The number of elements to be written.
         :type size: int, optional
-
         :returns: The number of elements written.
-        :rtype: int
 
         """
         try:
@@ -162,10 +160,8 @@ class _RingBufferBase(object):
         :param size: The number of elements to be read.
             If not specified, all available elements are read.
         :type size: int, optional
-
         :returns: A new buffer containing the read data.
             Its size may be less than the requested *size*.
-        :rtype: buffer
 
         """
         if size < 0:
@@ -182,10 +178,8 @@ class _RingBufferBase(object):
 
         :param data: The memory where the data should be stored.
         :type data: CData pointer or buffer
-
         :returns: The number of elements read, which may be less than
             the size of *data*.
-        :rtype: int
 
         """
         try:
@@ -205,13 +199,12 @@ class _RingBufferBase(object):
 
         :param size: The number of elements desired.
         :type size: int
-
         :returns:
             * The room available to be written or the given *size*,
               whichever is smaller.
             * The first buffer.
             * The second buffer.
-        :rtype: (int, buffer, buffer)
+        :rtype: tuple (int, buffer, buffer)
 
         """
         ptr1 = self._ffi.new('void**')
@@ -228,9 +221,7 @@ class _RingBufferBase(object):
 
         :param size: The number of elements to advance.
         :type size: int
-
         :returns: The new position.
-        :rtype: int
 
         .. note:: This is only needed when using
             :meth:`get_write_buffers`, the method :meth:`write` takes
@@ -247,13 +238,12 @@ class _RingBufferBase(object):
 
         :param size: The number of elements desired.
         :type size: int
-
         :returns:
             * The number of elements available for reading (which might
               be less than the requested *size*).
             * The first buffer.
             * The second buffer.
-        :rtype: (int, buffer, buffer)
+        :rtype: tuple (int, buffer, buffer)
 
         """
         ptr1 = self._ffi.new('void**')
@@ -270,9 +260,7 @@ class _RingBufferBase(object):
 
         :param size: The number of elements to advance.
         :type size: int
-
         :returns: The new position.
-        :rtype: int
 
         .. note:: This is only needed when using
             :meth:`get_read_buffers`, the methods :meth:`read` and

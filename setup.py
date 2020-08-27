@@ -21,6 +21,7 @@ setup(
     version=__version__,
     package_dir={'': 'src'},
     py_modules=['pa_ringbuffer'],
+    python_requires='>=2.6',
     author='Matthias Geier',
     author_email='Matthias.Geier@gmail.com',
     description="Python wrapper for PortAudio's ring buffer",

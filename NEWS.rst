@@ -1,3 +1,6 @@
+0.1.4 (2020-08-27):
+ * Minor documentation update
+
 0.1.3 (2018-06-02):
  * No new features, just a minor documentation update
 

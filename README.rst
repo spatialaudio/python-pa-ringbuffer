@@ -127,7 +127,7 @@ If you are using Sphinx_, you can seamlessly include the documentation of the
 ``RingBuffer`` class with your own documentation.
 An example for this can be found at
 https://github.com/spatialaudio/python-rtmixer, the generated documentation is
-available at http://python-rtmixer.readthedocs.io/#rtmixer.RingBuffer.
+available at https://python-rtmixer.readthedocs.io/api.html#rtmixer.RingBuffer.
 
 You'll need to have the autodoc_ extension activated in your ``conf.py``:
 

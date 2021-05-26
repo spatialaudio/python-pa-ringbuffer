@@ -77,14 +77,14 @@ your ``mycffimodule_build.py``:
 
 Note that the following files must be available to the compiler:
 
-* https://app.assembla.com/spaces/portaudio/git/source/master/src/common/pa_ringbuffer.c
-* https://app.assembla.com/spaces/portaudio/git/source/master/src/common/pa_ringbuffer.h
-* https://app.assembla.com/spaces/portaudio/git/source/master/src/common/pa_memorybarrier.h
+* https://github.com/PortAudio/portaudio/blob/master/src/common/pa_ringbuffer.c
+* https://github.com/PortAudio/portaudio/blob/master/src/common/pa_ringbuffer.h
+* https://github.com/PortAudio/portaudio/blob/master/src/common/pa_memorybarrier.h
 
 For your own C code, you might need some definitions from the main PortAudio
 header:
 
-* https://app.assembla.com/spaces/portaudio/git/source/master/include/portaudio.h
+* https://github.com/PortAudio/portaudio/blob/master/include/portaudio.h
 
 Once you have compiled your extension module (with the help of CFFI), you can
 use something like this in your own module to get access to the ``RingBuffer``
